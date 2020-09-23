@@ -22,7 +22,6 @@ relevant_features <- gsub("jerk", "_jerk_", relevant_features)
 relevant_features <- gsub("(_){2,}", "_", relevant_features)
 relevant_features <- gsub("body_body_", "body_body", relevant_features)
 
-
 # Create an activity label chart (matching number and activity name)
 activity_labels <- read.csv("activity_labels.txt", header = FALSE)
 activity_labels <- activity_labels$V1
@@ -41,3 +40,32 @@ for (i in 1:length(activity_vec)) {
 activity_chart <- data.frame(activity_num, tolower(activity_name))
 colnames(activity_chart) <- c("label", "activity")
 rm(i, activity_vec, activity_num, activity_name)
+
+# read in two portions of the full data
+setwd("~/Desktop/Coursera R/Getting:Cleaning Data/UCI HAR Dataset/test")
+test_subjects <- read.csv("subject_test.txt", header = FALSE)
+test_labels <- read.csv("y_test.txt", header = FALSE)
+test_set <- read.csv("X_test.txt", header = FALSE)
+
+setwd("~/Desktop/Coursera R/Getting:Cleaning Data/UCI HAR Dataset/train")
+training_subjects <- read.csv("subject_train.txt", header = FALSE)
+training_labels <- read.csv("y_train.txt", header = FALSE)
+training_set <- read.csv("X_train.txt", header = FALSE)
+
+# set working directory back to normal
+setwd("~/Desktop/Coursera R/Getting:Cleaning Data/CourseraDataCleaning")
+
+# combine testing and training data
+subject_ids <- rbind(test_subjects, training_subjects)
+activity_labels <- rbind(test_labels, training_labels)
+exp_data <- rbind(test_set, training_set)
+
+#remove parts to avoid environment clustering
+rm(test_subjects, test_labels, test_set,
+   training_subjects, training_labels, training_set)
+
+# change activity labels to actual activity names
+for (i in 1:nrow(activity_labels)) {
+    activity_labels[i,1] <- activity_chart[activity_labels[i,1],2]
+}
+rm(i, activity_chart)
