@@ -96,4 +96,4 @@ full_data <- arrange(full_data, subject_ids)
 # Calculate means
 full_data <- group_by(full_data, subjectid, activitylabel)
 tidy_data <- summarize_all(full_data, mean)
-write.table(tidy_data, file = "tidydata.csv", row.names = FALSE)
+write.table(tidy_data, file = "tidydata.txt", row.names = FALSE)
