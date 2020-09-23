@@ -69,3 +69,31 @@ for (i in 1:nrow(activity_labels)) {
     activity_labels[i,1] <- activity_chart[activity_labels[i,1],2]
 }
 rm(i, activity_chart)
+
+# create data frame to contain recorded data in better format (90-100 s)
+df_data <- data.frame()
+for (i in 1:nrow(exp_data)) {
+    row_i <- exp_data[i,1]
+    row_i <- gsub(" {2}", " ", row_i)
+    data_i <- unlist(strsplit(row_i, " "))
+    if (data_i[1] == ""){
+        data_i <- data_i[!(data_i %in% "")]
+    }
+    data_i <- data_i[mean_or_std]
+    data_i <- gsub("-00", "-", data_i)
+    data_i <- gsub("\\+000", "+0", data_i)
+    data_i <- as.numeric(data_i)
+    df_data <- rbind(df_data, data_i)
+}
+rm(i, row_i, data_i, exp_data, mean_or_std)
+
+# Combine three sets of data
+full_data <- cbind(subject_ids, activity_labels, df_data)
+colnames(full_data) <- c("subjectid", "activitylabel", relevant_features)
+full_data <- arrange(full_data, subject_ids)
+
+
+# Calculate means
+full_data <- group_by(full_data, subjectid, activitylabel)
+tidy_data <- summarize_all(full_data, mean)
+write.csv(tidy_data, file = "tidydata.csv")
